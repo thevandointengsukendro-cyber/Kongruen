@@ -268,7 +268,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, progress }) => {
                 5 Misi Kasus Detektif
               </h3>
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                {progress.completedCases.length}/5 Selesai
+                {(progress?.completedCases?.length || 0)}/5 Selesai
               </span>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed mb-4">
@@ -385,7 +385,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, progress }) => {
               icon: '🔳',
             },
           ].map((c) => {
-            const isDone = progress.completedCases.includes(c.id);
+            const isDone = (progress?.completedCases || []).includes(c.id);
             return (
               <div
                 key={c.id}

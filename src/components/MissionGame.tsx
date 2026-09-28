@@ -31,21 +31,26 @@ export const MissionGame: React.FC<MissionGameProps> = ({
   onUpdateProgress,
   onNavigate,
 }) => {
+  const safeCompleted = progress?.completedCases || [];
+  const safeAnswers = progress?.answers || {};
+  const safeHints = progress?.hintsRevealed || {};
+  const safeBadges = progress?.unlockedBadges || [];
+
   const [activeMissionId, setActiveMissionId] = useState<number>(() => {
     // Pick first unfinished mission or last mission
-    const firstUnfinished = MISSIONS_DATA.find((m) => !progress.completedCases.includes(m.id));
+    const firstUnfinished = MISSIONS_DATA.find((m) => !safeCompleted.includes(m.id));
     return firstUnfinished ? firstUnfinished.id : 1;
   });
 
   const mission = MISSIONS_DATA.find((m) => m.id === activeMissionId) || MISSIONS_DATA[0];
 
   // User state for active mission
-  const savedAnswer = progress.answers[mission.id];
+  const savedAnswer = safeAnswers[mission.id];
   const [selectedOption, setSelectedOption] = useState<string>(savedAnswer?.optionId || '');
   const [isAnswered, setIsAnswered] = useState<boolean>(!!savedAnswer);
   const [isCorrect, setIsCorrect] = useState<boolean>(savedAnswer?.isCorrect || false);
   const [revealedHintsCount, setRevealedHintsCount] = useState<number>(
-    progress.hintsRevealed[mission.id] || 0
+    safeHints[mission.id] || 0
   );
   const [showCelebrationBanner, setShowCelebrationBanner] = useState<boolean>(false);
 
@@ -53,11 +58,11 @@ export const MissionGame: React.FC<MissionGameProps> = ({
   const handleSelectMission = (id: number) => {
     soundManager.playClick();
     setActiveMissionId(id);
-    const existing = progress.answers[id];
+    const existing = safeAnswers[id];
     setSelectedOption(existing?.optionId || '');
     setIsAnswered(!!existing);
     setIsCorrect(existing?.isCorrect || false);
-    setRevealedHintsCount(progress.hintsRevealed[id] || 0);
+    setRevealedHintsCount(safeHints[id] || 0);
     setShowCelebrationBanner(false);
   };
 
@@ -75,7 +80,7 @@ export const MissionGame: React.FC<MissionGameProps> = ({
       onUpdateProgress({
         ...progress,
         hintsRevealed: {
-          ...progress.hintsRevealed,
+          ...safeHints,
           [mission.id]: nextCount,
         },
       });
@@ -89,24 +94,26 @@ export const MissionGame: React.FC<MissionGameProps> = ({
     setIsAnswered(true);
     setIsCorrect(correct);
 
-    const alreadyCompleted = progress.completedCases.includes(mission.id);
+    const alreadyCompleted = safeCompleted.includes(mission.id);
 
     if (correct) {
       soundManager.playCorrect();
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      } catch {}
 
       const updatedCompleted = alreadyCompleted
-        ? progress.completedCases
-        : [...progress.completedCases, mission.id];
-      const newScore = alreadyCompleted ? progress.score : Math.min(100, progress.score + 20);
+        ? safeCompleted
+        : [...safeCompleted, mission.id];
+      const newScore = alreadyCompleted ? (progress?.score || 0) : Math.min(100, (progress?.score || 0) + 20);
 
       const { newBadges, allUnlocked } = evaluateBadges(
         updatedCompleted.length,
-        progress.unlockedBadges
+        safeBadges
       );
 
       if (newBadges.length > 0) {
@@ -120,7 +127,7 @@ export const MissionGame: React.FC<MissionGameProps> = ({
         completedCases: updatedCompleted,
         unlockedBadges: allUnlocked,
         answers: {
-          ...progress.answers,
+          ...safeAnswers,
           [mission.id]: { optionId: selectedOption, isCorrect: true },
         },
       });
@@ -129,7 +136,7 @@ export const MissionGame: React.FC<MissionGameProps> = ({
       onUpdateProgress({
         ...progress,
         answers: {
-          ...progress.answers,
+          ...safeAnswers,
           [mission.id]: { optionId: selectedOption, isCorrect: false },
         },
       });
@@ -163,7 +170,7 @@ export const MissionGame: React.FC<MissionGameProps> = ({
               Peta Investigasi Forensik
             </span>
             <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
-              {progress.completedCases.length} dari 5 Kasus Selesai
+              {safeCompleted.length} dari 5 Kasus Selesai
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
@@ -174,7 +181,7 @@ export const MissionGame: React.FC<MissionGameProps> = ({
         {/* Progress Bar & Quick Case Selectors */}
         <div className="flex items-center gap-2">
           {MISSIONS_DATA.map((m) => {
-            const isDone = progress.completedCases.includes(m.id);
+            const isDone = safeCompleted.includes(m.id);
             const isCurrent = m.id === activeMissionId;
             return (
               <button

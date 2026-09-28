@@ -27,8 +27,10 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   onUpdateProgress,
   onNavigate,
 }) => {
+  const safeCompleted = progress?.completedCases || [];
+  const safeBadges = progress?.unlockedBadges || [];
   const totalMissions = 5;
-  const correctCount = progress.completedCases.length;
+  const correctCount = safeCompleted.length;
   const wrongCount = totalMissions - correctCount;
   const percentage = Math.round((correctCount / totalMissions) * 100);
 
@@ -112,7 +114,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
             <div className="bg-slate-900/70 backdrop-blur rounded-2xl p-4 border border-blue-400/20 text-center">
               <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-bold">Skor Akhir</span>
               <span className="text-2xl sm:text-3xl font-black text-amber-300 font-mono mt-1 block">
-                {progress.score} Pts
+                {(progress?.score ?? 0)} Pts
               </span>
               <span className="text-[11px] text-slate-400">dari 100 Poin</span>
             </div>
@@ -173,7 +175,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {INITIAL_BADGES.map((b) => {
-            const isEarned = progress.unlockedBadges.includes(b.id) || correctCount >= b.threshold;
+            const isEarned = safeBadges.includes(b.id) || correctCount >= b.threshold;
             return (
               <div
                 key={b.id}

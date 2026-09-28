@@ -109,11 +109,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Trophy className="w-4 h-4 text-amber-400" />
               <div className="flex flex-col text-left leading-tight">
                 <span className="text-[10px] text-slate-400 font-medium">Skor Kasus</span>
-                <span className="font-bold text-amber-300">{progress.score}/100 Pts</span>
+                <span className="font-bold text-amber-300">{(progress?.score ?? 0)}/100 Pts</span>
               </div>
               <div className="h-4 w-px bg-slate-700 mx-0.5" />
               <div className="text-[11px] font-semibold text-sky-200">
-                {progress.completedCases.length}/5 Misi
+                {(progress?.completedCases?.length || 0)}/5 Misi
               </div>
             </div>
 
@@ -163,7 +163,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Trophy className="w-4 h-4 text-amber-400" />
                 Lihat Hasil Investigasi
               </span>
-              <span>{progress.score} Pts</span>
+              <span>{(progress?.score ?? 0)} Pts</span>
             </button>
           </div>
         </div>

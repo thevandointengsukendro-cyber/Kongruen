@@ -16,7 +16,11 @@ export default function App() {
 
   // Scroll to top on page change
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
   }, [currentPage]);
 
   const handleUpdateProgress = (newProgress: UserProgress) => {
