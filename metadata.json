@@ -1,0 +1,6 @@
+{
+  "name": "GeoMatch: Detektif Bangun Geometri",
+  "description": "Media pembelajaran matematika interaktif berbasis game investigasi detektif untuk materi Kekongruenan dan Kesebangunan Segitiga dan Segiempat SMP Kelas IX.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
